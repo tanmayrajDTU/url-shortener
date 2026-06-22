@@ -4,6 +4,6 @@ dockerfilePath = "Dockerfile"
 
 [deploy]
 startCommand = "dotnet UrlShortener.dll"
-healthcheckPath = "/api/urls"
+healthcheckPath = "/health"
 healthcheckTimeout = 30
 restartPolicyType = "on_failure"
