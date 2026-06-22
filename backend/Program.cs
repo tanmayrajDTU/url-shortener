@@ -68,11 +68,14 @@ try
 {
     using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+
+    Console.WriteLine("Before migration");
     await db.Database.MigrateAsync();
+    Console.WriteLine("After migration");
 }
 catch (Exception ex)
 {
-    Console.WriteLine($"Migration failed: {ex}");
+    Console.WriteLine(ex);
 }
 
 if (app.Environment.IsDevelopment())
@@ -80,6 +83,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.UseCors();
+//app.UseHttpsRedirection();
+app.UseRedisRateLimiter();
+
 app.MapGet("/health", () =>
 {
     return Results.Ok(new
@@ -90,11 +97,5 @@ app.MapGet("/health", () =>
 });
 
 app.MapControllers();
-app.UseCors();
-app.UseHttpsRedirection();
 
-// Rate limiter sits before controllers — applies to every request
-app.UseRedisRateLimiter();
-
-app.MapControllers();
 app.Run();
