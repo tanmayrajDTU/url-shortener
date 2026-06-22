@@ -11,31 +11,34 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // ── Redis ─────────────────────────────────────────────────────────────────────
-var redisConn = builder.Configuration.GetConnectionString("Redis");
+var redisHost = builder.Configuration["REDIS_HOST"];
+var redisPort = builder.Configuration["REDIS_PORT"];
+var redisPassword = builder.Configuration["REDIS_PASSWORD"];
 
-if (!string.IsNullOrEmpty(redisConn))
+if (!string.IsNullOrEmpty(redisHost))
 {
-    Console.WriteLine($"Redis: {redisConn}");
-    // IConnectionMultiplexer — used by rate limiter (needs raw Redis commands / Lua)
-    var options = ConfigurationOptions.Parse(redisConn);
-    options.AbortOnConnectFail = false;
-    options.ConnectRetry = 3;
+    var options = new ConfigurationOptions
+    {
+        AbortOnConnectFail = false,
+        ConnectRetry = 3,
+        Password = redisPassword
+    };
+
+    options.EndPoints.Add(
+        redisHost,
+        int.Parse(redisPort ?? "6379")
+    );
 
     builder.Services.AddSingleton<IConnectionMultiplexer>(
         ConnectionMultiplexer.Connect(options));
 
-    // IDistributedCache — used by UrlService for URL caching
-    builder.Services.AddStackExchangeRedisCache(o => o.Configuration = redisConn);
+    builder.Services.AddStackExchangeRedisCache(o =>
+    {
+        o.ConfigurationOptions = options;
+    });
 }
 else
 {
-    // Local dev fallback: no Redis needed
-    // Rate limiter will log a warning and fail open; cache uses in-memory
-    builder.Services.AddSingleton<IConnectionMultiplexer>(_ =>
-    {
-        // Returns a disconnected multiplexer — rate limiter catches the exception and fails open
-        return ConnectionMultiplexer.Connect("localhost:6379,abortConnect=false");
-    });
     builder.Services.AddDistributedMemoryCache();
 }
 
