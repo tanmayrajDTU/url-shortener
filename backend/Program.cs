@@ -15,9 +15,14 @@ var redisConn = builder.Configuration.GetConnectionString("Redis");
 
 if (!string.IsNullOrEmpty(redisConn))
 {
+    Console.WriteLine($"Redis: {redisConn}");
     // IConnectionMultiplexer — used by rate limiter (needs raw Redis commands / Lua)
+    var options = ConfigurationOptions.Parse(redisConn);
+    options.AbortOnConnectFail = false;
+    options.ConnectRetry = 3;
+
     builder.Services.AddSingleton<IConnectionMultiplexer>(
-        ConnectionMultiplexer.Connect(redisConn));
+        ConnectionMultiplexer.Connect(options));
 
     // IDistributedCache — used by UrlService for URL caching
     builder.Services.AddStackExchangeRedisCache(o => o.Configuration = redisConn);
