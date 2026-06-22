@@ -66,6 +66,7 @@ builder.Services.AddCors(options =>
 // ── Build ─────────────────────────────────────────────────────────────────────
 var app = builder.Build();
 
+//Check later
 // Auto-migrate on startup (safe for Railway — idempotent)
 // try
 // {
