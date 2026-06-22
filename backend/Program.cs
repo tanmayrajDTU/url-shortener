@@ -64,10 +64,15 @@ builder.Services.AddCors(options =>
 var app = builder.Build();
 
 // Auto-migrate on startup (safe for Railway — idempotent)
-using (var scope = app.Services.CreateScope())
+try
 {
+    using var scope = app.Services.CreateScope();
     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
     await db.Database.MigrateAsync();
+}
+catch (Exception ex)
+{
+    Console.WriteLine($"Migration failed: {ex}");
 }
 
 if (app.Environment.IsDevelopment())
@@ -75,7 +80,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+app.MapGet("/health", () =>
+{
+    return Results.Ok(new
+    {
+        status = "healthy",
+        timestamp = DateTime.UtcNow
+    });
+});
 
+app.MapControllers();
 app.UseCors();
 app.UseHttpsRedirection();
 

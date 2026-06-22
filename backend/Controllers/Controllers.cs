@@ -101,3 +101,18 @@ public class RedirectController(IUrlService urlService) : ControllerBase
         return RedirectPermanent(url.OriginalUrl);
     }
 }
+
+[ApiController]
+[Route("health")]
+public class HealthController : ControllerBase
+{
+    [HttpGet]
+    public IActionResult Get()
+    {
+        return Ok(new
+        {
+            status = "healthy",
+            timestamp = DateTime.UtcNow
+        });
+    }
+}
