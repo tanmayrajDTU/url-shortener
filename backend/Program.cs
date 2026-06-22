@@ -68,19 +68,25 @@ var app = builder.Build();
 
 //Check later
 // Auto-migrate on startup (safe for Railway — idempotent)
-// try
-// {
-//     using var scope = app.Services.CreateScope();
-//     var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+try
+{
+    using var scope = app.Services.CreateScope();
+    var db = scope.ServiceProvider.GetRequiredService<AppDbContext>();
 
-//     Console.WriteLine("Before migration");
-//     await db.Database.MigrateAsync();
-//     Console.WriteLine("After migration");
-// }
-// catch (Exception ex)
-// {
-//     Console.WriteLine(ex);
-// }
+Console.WriteLine("Before migration");
+
+var pending = await db.Database.GetPendingMigrationsAsync();
+
+Console.WriteLine($"Pending migrations: {string.Join(", ", pending)}");
+
+await db.Database.MigrateAsync();
+
+Console.WriteLine("After migration");
+}
+catch (Exception ex)
+{
+    Console.WriteLine(ex);
+}
 
 if (app.Environment.IsDevelopment())
 {
