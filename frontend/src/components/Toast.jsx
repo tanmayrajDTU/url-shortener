@@ -1,10 +1,15 @@
-// Global toast notification system
-// Usage: import { useToast, ToastContainer } from './Toast.jsx'
-// Place <ToastContainer /> once in Layout, use toast.show() anywhere
-
 import { useState, useCallback, createContext, useContext, useRef } from 'react'
+import { AnimatePresence, motion } from 'framer-motion'
+import { AlertTriangle, CheckCircle2, Info, XCircle } from 'lucide-react'
 
 const ToastContext = createContext(null)
+
+const tone = {
+  success: { icon: CheckCircle2, color: 'var(--success)', bg: 'rgba(66,245,155,0.1)' },
+  error: { icon: XCircle, color: 'var(--error)', bg: 'rgba(255,93,115,0.11)' },
+  info: { icon: Info, color: 'var(--accent-2)', bg: 'rgba(34,211,238,0.1)' },
+  warn: { icon: AlertTriangle, color: 'var(--warning)', bg: 'rgba(246,196,83,0.1)' },
+}
 
 export function ToastProvider({ children }) {
   const [toasts, setToasts] = useState([])
@@ -21,49 +26,36 @@ export function ToastProvider({ children }) {
   return (
     <ToastContext.Provider value={{ show }}>
       {children}
-      <div style={{
-        position: 'fixed', bottom: '28px', right: '28px',
-        display: 'flex', flexDirection: 'column', gap: '10px',
-        zIndex: 10000, pointerEvents: 'none',
-      }}>
-        {toasts.map(t => (
-          <Toast key={t.id} toast={t} />
-        ))}
+      <div className="toast-stack" role="status" aria-live="polite">
+        <AnimatePresence>
+          {toasts.map(toast => (
+            <Toast key={toast.id} toast={toast} />
+          ))}
+        </AnimatePresence>
       </div>
     </ToastContext.Provider>
   )
 }
 
 function Toast({ toast }) {
-  const colors = {
-    success: { bg: 'rgba(46,213,115,0.12)', border: 'rgba(46,213,115,0.35)', color: '#2ed573', icon: '✓' },
-    error:   { bg: 'rgba(255,71,87,0.12)',  border: 'rgba(255,71,87,0.35)',  color: '#ff4757', icon: '✗' },
-    info:    { bg: 'rgba(84,160,255,0.12)', border: 'rgba(84,160,255,0.35)', color: '#54a0ff', icon: 'ℹ' },
-    warn:    { bg: 'rgba(255,165,2,0.12)',  border: 'rgba(255,165,2,0.35)',  color: '#ffa502', icon: '⚠' },
-  }
-  const c = colors[toast.type] || colors.success
+  const c = tone[toast.type] || tone.success
+  const Icon = c.icon
 
   return (
-    <div style={{
-      pointerEvents: 'auto',
-      display: 'flex', alignItems: 'flex-start', gap: '10px',
-      padding: '12px 16px', borderRadius: '8px',
-      background: '#111', border: `1px solid ${c.border}`,
-      boxShadow: `0 4px 24px rgba(0,0,0,0.4), 0 0 0 1px ${c.border}`,
-      maxWidth: '340px', minWidth: '240px',
-      animation: 'toastIn 0.25s cubic-bezier(0.16,1,0.3,1)',
-      fontFamily: 'Syne, sans-serif',
-    }}>
-      <span style={{
-        width: 22, height: 22, borderRadius: '50%',
-        background: c.bg, border: `1px solid ${c.border}`,
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: '11px', fontWeight: 700, color: c.color, flexShrink: 0,
-      }}>{c.icon}</span>
-      <span style={{ fontSize: '13px', color: '#f0f0f0', lineHeight: 1.5, fontWeight: 500 }}>
+    <motion.div
+      className="toast panel"
+      initial={{ opacity: 0, y: 18, scale: 0.96 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 10, scale: 0.97 }}
+      transition={{ type: 'spring', stiffness: 420, damping: 32 }}
+    >
+      <span className="icon-badge" style={{ background: c.bg, color: c.color }}>
+        <Icon size={18} />
+      </span>
+      <span style={{ color: 'var(--muted-strong)', fontSize: 14, lineHeight: 1.5 }}>
         {toast.message}
       </span>
-    </div>
+    </motion.div>
   )
 }
 

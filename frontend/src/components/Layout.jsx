@@ -1,52 +1,44 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Scissors, LayoutDashboard } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { LayoutDashboard } from 'lucide-react'
 
 export default function Layout({ children }) {
   const { pathname } = useLocation()
 
   return (
-    <div style={{ minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <nav style={{
-        borderBottom: '1px solid var(--border)',
-        padding: '0 32px',
-        height: '60px',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        position: 'sticky',
-        top: 0,
-        zIndex: 100,
-        background: 'rgba(10,10,10,0.92)',
-        backdropFilter: 'blur(12px)',
-      }}>
-        <Link to="/" style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <div style={{
-            background: 'var(--accent)', borderRadius: '4px',
-            width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center'
-          }}>
-            <Scissors size={15} color="#0a0a0a" strokeWidth={2.5} />
-          </div>
-          <span style={{ fontWeight: 800, fontSize: '18px', letterSpacing: '-0.02em' }}>snip</span>
-        </Link>
+    <div className="app-shell">
+      <header className="app-nav">
+        <div className="nav-inner">
+          <Link to="/" className="brand" aria-label="Snip home">
+            <motion.span
+              className="brand-mark"
+              whileHover={{ rotate: -8, scale: 1.04 }}
+              transition={{ type: 'spring', stiffness: 420, damping: 20 }}
+            >
+              <img className="brand-icon" src="/favicon.svg?v=3" alt="" aria-hidden="true" />
+            </motion.span>
+            <span className="brand-name">Snip</span>
+          </Link>
 
-        <div style={{ display: 'flex', gap: '8px' }}>
-          <NavLink to="/" active={pathname === '/'}>Shorten</NavLink>
-          <NavLink to="/dashboard" active={pathname === '/dashboard'}>
-            <LayoutDashboard size={14} />
-            Dashboard
-          </NavLink>
+          <nav className="nav-links" aria-label="Primary navigation">
+            <NavLink to="/" active={pathname === '/'}>
+              Shorten
+            </NavLink>
+            <NavLink to="/dashboard" active={pathname === '/dashboard' || pathname.startsWith('/analytics')}>
+              <LayoutDashboard size={15} />
+              Dashboard
+            </NavLink>
+          </nav>
         </div>
-      </nav>
+      </header>
 
-      <main style={{ flex: 1, padding: '40px 32px', maxWidth: '960px', margin: '0 auto', width: '100%' }}>
-        {children}
-      </main>
+      <main className="app-main">{children}</main>
 
-      <footer style={{
-        borderTop: '1px solid var(--border)', padding: '20px 32px',
-        textAlign: 'center', color: 'var(--muted)', fontSize: '13px', fontFamily: 'var(--font-mono)'
-      }}>
-        built with ASP.NET Core · Redis · PostgreSQL · React
+      <footer className="app-footer">
+        <div className="footer-inner">
+          <span>URL management, analytics, and redirects.</span>
+          <span className="mono">ASP.NET Core / Redis / PostgreSQL / React</span>
+        </div>
       </footer>
     </div>
   )
@@ -54,15 +46,7 @@ export default function Layout({ children }) {
 
 function NavLink({ to, active, children }) {
   return (
-    <Link to={to} style={{
-      display: 'flex', alignItems: 'center', gap: '6px',
-      padding: '6px 14px', borderRadius: 'var(--radius)',
-      fontSize: '14px', fontWeight: 600,
-      background: active ? 'var(--surface2)' : 'transparent',
-      color: active ? 'var(--text)' : 'var(--muted)',
-      border: active ? '1px solid var(--border)' : '1px solid transparent',
-      transition: 'all 0.15s',
-    }}>
+    <Link to={to} className={`nav-link ${active ? 'active' : ''}`}>
       {children}
     </Link>
   )
