@@ -94,10 +94,10 @@ export default function HomePage() {
               <Sparkles size={14} /> Premium URL infrastructure
             </motion.span>
             <motion.h1 variants={fadeUp}>
-              Short links that feel <span className="gradient-text">production ready.</span>
+              Shorten, share, <span className="gradient-text">and track every link.</span>
             </motion.h1>
             <motion.p className="hero-copy" variants={fadeUp}>
-              Create clean, branded URLs with custom aliases, expiry controls, and analytics in a polished dashboard.
+              Create branded short URLs with analytics, custom aliases, and expiration controls.
             </motion.p>
             <motion.div className="hero-actions" variants={fadeUp}>
               <a href="#shorten" className="btn btn-primary">
