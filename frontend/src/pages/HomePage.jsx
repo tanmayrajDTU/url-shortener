@@ -153,6 +153,7 @@ export default function HomePage() {
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: 'auto' }}
                   exit={{ opacity: 0, height: 0 }}
+                  style={{ overflow: 'hidden' }}
                 >
                   <div>
                     <label className="field-label" htmlFor="alias"><Tag size={13} /> Custom alias</label>

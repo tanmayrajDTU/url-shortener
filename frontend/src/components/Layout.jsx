@@ -46,8 +46,25 @@ export default function Layout({ children }) {
 
 function NavLink({ to, active, children }) {
   return (
-    <Link to={to} className={`nav-link ${active ? 'active' : ''}`}>
-      {children}
+    <Link to={to} className={`nav-link ${active ? 'active' : ''}`} style={{ position: 'relative' }}>
+      {active && (
+        <motion.span
+          layoutId="active-nav-bg"
+          className="active-nav-bg"
+          transition={{ type: 'spring', stiffness: 380, damping: 30 }}
+          style={{
+            position: 'absolute',
+            inset: 0,
+            borderRadius: '999px',
+            background: 'rgba(255, 255, 255, 0.08)',
+            border: '1px solid rgba(255, 255, 255, 0.12)',
+            zIndex: 0,
+          }}
+        />
+      )}
+      <span style={{ position: 'relative', zIndex: 1, display: 'inline-flex', alignItems: 'center', gap: 7 }}>
+        {children}
+      </span>
     </Link>
   )
 }
