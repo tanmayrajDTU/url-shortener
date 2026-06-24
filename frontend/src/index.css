@@ -630,6 +630,10 @@ input::placeholder { color: rgba(200, 208, 228, 0.48); }
   outline: none;
   transition: all 160ms ease;
 }
+.select option {
+  background-color: #0d1220;
+  color: var(--text);
+}
 .select:hover {
   border-color: var(--border-strong);
   background-color: rgba(255,255,255,0.1);
